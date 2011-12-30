@@ -5,6 +5,7 @@ require 'uri'
 if $stdout.tty?
   if File.exist?(ARGV[0])
     text = File.read(ARGV[0])
+    save_as = ARGV[1]
   else
     require 'open-uri'
     text = open(ARGV[0], 'Accept' => 'text/plain').read
@@ -13,8 +14,12 @@ else
   text = readlines.join
 end
 
-response = Net::HTTP.post_form(URI.parse('http://www.websequencediagrams.com/index.php'), {'style' => 'omegapple', 'message' => text})
+response = Net::HTTP.post_form(URI.parse('http://www.websequencediagrams.com/index.php'), {'style' => 'modern-blue', 'message' => text})
 
 if response.body =~ /img: "(.+)"/
-  system("open http://www.websequencediagrams.com/#{$1}")
+  if save_as
+    system("wget -O #{save_as} http://www.websequencediagrams.com/#{$1}")
+  else
+    system("open http://www.websequencediagrams.com/#{$1}")
+  end
 end
